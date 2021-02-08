@@ -618,6 +618,7 @@ def optimize(imagefiles, lineage, realimages, synthimages, cellmaps, distmaps, w
     total_iterations = iteration_per_cell*lineage.count_cells_in(window_start, window_end)//window
     bad_count = 0
     current_iteration = 1
+        
     while current_iteration < total_iterations:
         frame_index = lineage.choose_random_frame_index(window_start, window_end)
         if in_auto_temp_schedule:
@@ -632,18 +633,26 @@ def optimize(imagefiles, lineage, realimages, synthimages, cellmaps, distmaps, w
         node = random.choice(frame.nodes)
         change_option = np.random.choice(["split", "perturbation", "combine", "background_offset"], p=[split_prob, perturbation_prob, combine_prob, background_offset_prob])
         change = None
-        if change_option == "split" and random.random() < optimization.split_proba(node.cell.length) and frame_index > 0:
+        if change_option == "split" and np.random.random_sample() < optimization.split_proba(node.cell.length) and frame_index > 0:
+            # print("split")
             change = Split(node.parent, config, realimages[frame_index], synthimages[frame_index], cellmaps[frame_index], lineage.frames[frame_index], distmaps[frame_index])
             
         elif change_option == "perturbation":
+            # print("preturbation")
             change = Perturbation(node, config, realimages[frame_index], synthimages[frame_index], cellmaps[frame_index], lineage.frames[frame_index], distmaps[frame_index])
             
-        elif change_option == "combine" and frame_index > 0:
+        elif change_option == "combine" and frame_index > 0: #and block_comb_remaining ==0:
+            # print("combine")
             change = Combination(node.parent, config, realimages[frame_index], synthimages[frame_index], cellmaps[frame_index], lineage.frames[frame_index], distmaps[frame_index])
 
         elif change_option == "background_offset" and frame_index > 0 and config["simulation"]["image.type"] == "graySynthetic":
+            # print("background")
             change = BackGround_luminosity_offset(lineage.frames[frame_index], realimages[frame_index], synthimages[frame_index], cellmaps[frame_index], config)
         
+        elif change_option == "opacity_diffraction_offset" and frame_index > 0 and config["simulation"]["image.type"] == "graySynthetic":
+            # print("opacity change")
+            change = Opacity_Diffraction_offset(lineage.frames[frame_index], realimages[frame_index], synthimages[frame_index], cellmaps[frame_index], config)
+                    
         if change and change.is_valid:
             # apply if acceptable
             costdiff = change.costdiff
