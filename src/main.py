@@ -16,6 +16,9 @@ from scipy.ndimage import distance_transform_edt
 from colony import LineageFrames
 import numpy as np
 
+import cProfile, pstats
+import time
+
 import sys
 sys.setrecursionlimit(10000)
 # bootleg fix to prevent recursion error when pickling large lineages
@@ -399,10 +402,12 @@ if __name__ == '__main__':
     from cell import Bacilli
     from optimization import optimize
     from sys import exit
-    # pr = cProfile.Profile()
-    # pr.enable()
+    pr = cProfile.Profile()
+    pr.enable()
     print('CHECKPOINT, {}, {}, {}'.format(time.time(), -1, -1), flush=True)
-    exit(main(args))
-    # main(args)
-    # pr.disable()
-    # pr.dump_stats('./main.profile')
+    # exit(main(args))
+    try:
+        main(args)
+    finally:
+        pr.disable()
+        pr.dump_stats('./main.profile')

@@ -1,0 +1,1 @@
+python "./main.py"     --debug "./r2_debug"     --input "./r2_input/%d.png"     --output "./r2_output"     --bestfit "./r2_bestfit"     --config "./r2_config.json"     --initial "./r2_cells.0.csv"     --global_optimization     --binary --lineage_file "r2_initial.csv"

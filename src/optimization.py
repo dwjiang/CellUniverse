@@ -95,6 +95,7 @@ def generate_synthetic_image(cellnodes, shape, simulation_config):
 def load_image(imagefile):
     """Open the image file and convert to a floating-point grayscale array."""
     with open(imagefile, 'rb') as fp:
+        # print(Image.open(fp))
         realimage = np.array(Image.open(fp))
     if realimage.dtype == np.uint8:
         realimage = realimage.astype(float)/255
